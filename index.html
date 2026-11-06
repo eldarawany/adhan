@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0b1716"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="نور الأذان"><link rel="apple-touch-icon" href="icon-192.png"><title>نور الأذان</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600&family=Tajawal:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap">
+<style>
+:root{--bg:#f3eee2;--card:#fffaf0;--tx:#1b2a28;--mut:#6a7873;--ac:#0e6f55;--gold:#a97a1f;--bd:#e3d9c0;--hi:#e4f2ea}
+:root[data-theme=dark]{--bg:#0b1716;--card:#12211f;--tx:#e8f1ed;--mut:#8aa19b;--ac:#3fc79b;--gold:#e0b44f;--bd:#213937;--hi:#17332d}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f,Cairo),Tahoma,sans-serif;min-height:100vh;padding:env(safe-area-inset-top) 14px 28px}
+.wrap{max-width:560px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
+h1{font:700 22px var(--f,Amiri),serif;margin:0;color:var(--gold)}
+.tools{display:flex;gap:6px}.wa{background:#25D366;border-color:#25D366}.wa svg{width:22px;height:22px;display:block;margin:auto}
+button,select,input{font:inherit;color:var(--tx)}
+.ib{width:38px;height:38px;padding:0;border-radius:50%;border:1px solid var(--bd);background:var(--card);font-size:18px;cursor:pointer}
+.ib:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.hero{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:22px 16px;text-align:center}
+.clock{font:700 56px/1.1 var(--f,Amiri),serif;direction:ltr;letter-spacing:1px}
+.date{color:var(--mut);margin-top:4px;font-size:14px}
+.next{margin-top:18px;padding-top:16px;border-top:1px dashed var(--bd)}
+.next small{color:var(--mut)}
+.next b{display:block;font:700 26px var(--f,Amiri),serif;color:var(--ac);margin:2px 0}
+.cd{font:600 34px/1.2 Cairo,sans-serif;direction:ltr;color:var(--gold);font-variant-numeric:tabular-nums}
+.bar{height:6px;background:var(--bd);border-radius:6px;margin:12px 6px 0;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--ac);transition:width 1s linear}
+.list{margin:16px 0;background:var(--card);border:1px solid var(--bd);border-radius:20px;overflow:hidden}
+.row{display:flex;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--bd);font-size:17px}
+.row:last-child{border:0}
+.row span:last-child{direction:ltr;font-variant-numeric:tabular-nums}
+.row.sun{color:var(--mut)}
+.row.on{background:var(--hi);font-weight:600;color:var(--ac)}
+.row.done:not(.on){opacity:.55}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:14px;display:grid;gap:10px}
+.line{display:flex;gap:8px;flex-wrap:wrap}
+input,select{flex:1;min-width:110px;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg)}
+.btn{padding:10px 14px;border-radius:10px;border:1px solid var(--ac);background:var(--ac);color:#fff;cursor:pointer;font-weight:600}
+.btn.alt{background:transparent;color:var(--ac)}
+#msg{text-align:center;color:var(--mut);font-size:14px;min-height:20px;margin:10px 0}
+.alert{position:fixed;inset:auto 14px 20px;max-width:520px;margin:auto;background:var(--ac);color:#fff;padding:14px;border-radius:16px;display:none;justify-content:space-between;align-items:center;gap:10px;font-weight:600;z-index:5}
+.alert.show{display:flex}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+details.panel{margin:12px 0;display:block}summary{cursor:pointer;font-weight:600;color:var(--gold);font-size:17px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;font-size:13px}.cal b{color:var(--mut);font-weight:400}
+.cal div.d{padding:5px 0;border-radius:8px;border:1px solid transparent}.cal small{display:block;color:var(--mut);font-size:10px}
+.cal .h{background:var(--hi);border-color:var(--ac)}.cal .t{outline:2px solid var(--gold)}
+.ev{font-size:14px;display:flex;gap:8px;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--bd)}
+#dial{position:relative;width:210px;height:210px;margin:8px auto;border:3px solid var(--bd);border-radius:50%;transition:transform .2s}
+#dial .n{position:absolute;top:2px;left:50%;transform:translateX(-50%);color:var(--mut);font-size:12px}
+#qarrow{position:absolute;inset:0}#qarrow:before{content:"";position:absolute;left:50%;top:26px;bottom:50%;border-left:3px solid var(--gold);transform:translateX(-50%)}
+#qarrow i{position:absolute;top:2px;left:50%;transform:translateX(-50%);font-style:normal;font-size:24px}
+.q{text-align:center;color:var(--mut);font-size:14px}.q b{color:var(--ac);font-size:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header>
+  <h1>نور الأذان</h1>
+  <div class="tools">
+   <button class="ib wa" id="wa" title="مشاركة المواقيت عبر واتساب" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path fill="#fff" d="M12 2.5a9.4 9.4 0 0 0-8 14.3L2.6 21.5l4.8-1.3A9.4 9.4 0 1 0 12 2.5zm5.3 13.2c-.2.6-1.300 1.200-1.800 1.200-.5.100-1 .1-3.200-.8-2.700-1.100-4.400-3.800-4.500-4-.1-.2-1.100-1.500-1.100-2.800s.7-2 1-2.300c.2-.2.5-.3.700-.3h.5c.2 0 .4 0 .6.500l.9 2.100c.1.200.1.400 0 .5l-.5.700c-.1.100-.3.300-.1.600.2.300.8 1.200 1.700 2 1.100 1 2 1.300 2.300 1.400.3.100.5.100.7-.1l.9-1.100c.2-.2.4-.2.6-.1l2 1c.3.100.5.200.5.300.1.200.1.800-.1 1.300z"/></svg></button>
+   <button class="ib" id="set" title="الإعدادات" aria-label="Settings">⚙️</button>
+   <button class="ib" id="wl" title="إبقاء الشاشة مضاءة" aria-label="إبقاء الشاشة مضاءة" style="opacity:.5">📱</button>
+   <button class="ib" id="snd" title="تفعيل / كتم صوت الأذان" aria-label="تفعيل أو كتم الصوت">🔇</button>
+   <button class="ib" id="thm" title="الوضع الداكن / الفاتح" aria-label="تبديل الوضع">🌙</button>
+  </div>
+ </header>
+
+ <section class="hero">
+  <div class="clock" id="clock">--:--:--</div>
+  <div class="date" id="date"></div>
+  <div class="next">
+   <small>الأذان القادم</small>
+   <b id="nname">...</b>
+   <div class="cd" id="cd">--:--:--</div>
+   <div class="bar"><i id="bar"></i></div>
+  </div>
+ </section>
+
+ <div id="msg">جارٍ تحديد موقعك...</div>
+
+ <section class="list" id="list"></section>
+
+ <section class="panel">
+  <div class="line">
+   <input id="city" placeholder="المدينة (مثال: Cairo)">
+   <input id="country" placeholder="الدولة (مثال: Egypt)">
+  </div>
+  <div class="line">
+   <select id="method" aria-label="طريقة الحساب">
+    <option value="4">أم القرى (مكة)</option>
+    <option value="5">الهيئة المصرية</option>
+    <option value="3">رابطة العالم الإسلامي</option>
+    <option value="2">أمريكا الشمالية</option>
+    <option value="1">كراتشي</option>
+   </select>
+   <button class="btn" id="go">بحث بالمدينة</button>
+   <button class="btn alt" id="gps">📍 موقعي</button>
+  </div>
+  <div class="line"><button class="btn alt" id="test">🔊 تجربة الأذان</button><button class="btn alt" id="notif">🔔 تفعيل الإشعارات</button></div>
+  <div class="line"><button class="btn" id="cal" style="flex:1">📅 تنبيهات في تقويم الهاتف (30 يومًا)</button></div>
+ </section>
+
+ <details class="panel" id="dcal"><summary>📅 التقويم والمناسبات</summary>
+  <div class="line" style="margin:10px 0"><button class="btn alt" id="cp">›</button><b id="ctitle" style="flex:1;text-align:center"></b><button class="btn alt" id="cn">‹</button></div>
+  <div class="line" style="margin-bottom:8px"><select id="ctry" aria-label="الدولة">
+   <option value="SA">السعودية / Saudi Arabia</option><option value="EG">مصر / Egypt</option><option value="AE">الإمارات / UAE</option><option value="QA">قطر / Qatar</option><option value="KW">الكويت / Kuwait</option><option value="BH">البحرين / Bahrain</option><option value="OM">عُمان / Oman</option><option value="JO">الأردن / Jordan</option><option value="LB">لبنان / Lebanon</option><option value="MA">المغرب / Morocco</option><option value="TN">تونس / Tunisia</option><option value="TR">تركيا / Türkiye</option><option value="ID">إندونيسيا / Indonesia</option><option value="ZA">جنوب أفريقيا / South Africa</option><option value="GB">بريطانيا / UK</option><option value="US">أمريكا / USA</option><option value="CA">كندا / Canada</option><option value="DE">ألمانيا / Germany</option><option value="FR">فرنسا / France</option><option value="XX">أخرى (مناسبات إسلامية فقط) / Other</option></select></div>
+  <div class="cal" id="cgrid"></div><div id="cev" style="margin-top:10px"></div>
+  <div class="q" style="margin-top:8px">التاريخ الهجري حسب أم القرى وقد يختلف يومًا حسب رؤية الهلال.</div>
+ </details>
+ <details class="panel" id="dq"><summary>🕋 اتجاه القبلة</summary>
+  <div id="dial"><span class="n">N</span><div id="qarrow"><i>🕋</i></div></div>
+  <div class="q">اتجاه القبلة: <b id="qdeg">--</b></div>
+  <div class="line" style="margin-top:8px"><button class="btn" id="qbtn" style="flex:1">🧭 تفعيل البوصلة</button></div>
+  <div class="q" id="qnote" style="margin-top:6px">ضع الهاتف أفقيًا وأبعده عن المعادن. تحتاج البوصلة رابطًا https (بعد الاستضافة).</div>
+ </details>
+ <details class="panel" id="dset"><summary>⚙️ الإعدادات</summary>
+  <div class="line" style="margin:10px 0"><span style="align-self:center">اللغة</span><select id="slang"><option value="ar">العربية</option><option value="en">English</option></select></div>
+  <div class="line"><span style="align-self:center">الخط</span><select id="sfont"><option value="Cairo">Cairo</option><option value="Amiri">Amiri</option><option value="Tajawal">Tajawal</option><option value="Noto Naskh Arabic">Noto Naskh</option><option value="system-ui">النظام / System</option></select>
+   <select id="ssize"><option value="0.9">صغير</option><option value="1">متوسط</option><option value="1.12">كبير</option></select></div>
+  <div class="line" style="margin-top:10px"><span style="align-self:center">المؤذن</span><select id="smua"><option value="0">المؤذن 1 / Muezzin 1</option><option value="1">المؤذن 2 / Muezzin 2</option><option value="2">المؤذن 3 / Muezzin 3</option><option value="3">ملفي الخاص / My own file</option></select></div>
+  <div class="line"><label class="btn alt" style="flex:1;text-align:center">🎵 اختيار ملف أذان من هاتفك<input type="file" id="sfile" accept="audio/*" hidden></label></div>
+  <div class="q" id="snote"></div>
+ </details>
+</div>
+
+<div class="alert" id="alert"><span id="atxt"></span><button class="btn alt" style="color:#fff;border-color:#fff" id="stop">إيقاف الأذان</button></div>
+<audio id="aud" preload="none"></audio>
+
+<script>
+// ===== إعدادات =====
+// ضع ملف adhan.mp3 بجانب هذا الملف لاستخدامه أولًا، وإلا تُجرَّب الروابط التالية بالترتيب
+let ADHAN_SOURCES=['adhan.mp3','https://cdn.aladhan.com/audio/adhans/a1.mp3','https://www.islamcan.com/audio/adhan/azan1.mp3'];
+const PRAYERS=[['Fajr','الفجر'],['Sunrise','الشروق'],['Dhuhr','الظهر'],['Asr','العصر'],['Maghrib','المغرب'],['Isha','العشاء']];
+
+const $=id=>document.getElementById(id);
+let lang=(()=>{try{return JSON.parse(localStorage.getItem('lang'))||'ar'}catch(e){return 'ar'}})(),detCC='',coords=null,heading=null;
+const EN={'نور الأذان':'Nour Al-Adhan','الأذان القادم':'Next adhan','الفجر':'Fajr','الشروق':'Sunrise','الظهر':'Dhuhr','العصر':'Asr','المغرب':'Maghrib','العشاء':'Isha','المدينة (مثال: Cairo)':'City (e.g. Cairo)','الدولة (مثال: Egypt)':'Country (e.g. Egypt)','أم القرى (مكة)':'Umm al-Qura (Makkah)','الهيئة المصرية':'Egyptian Authority','رابطة العالم الإسلامي':'Muslim World League','أمريكا الشمالية':'North America','كراتشي':'Karachi','بحث بالمدينة':'Search city','📍 موقعي':'📍 My location','🔊 تجربة الأذان':'🔊 Test adhan','🔔 تفعيل الإشعارات':'🔔 Enable notifications','📅 تنبيهات في تقويم الهاتف (30 يومًا)':'📅 Add alerts to phone calendar (30 days)','إيقاف الأذان':'Stop adhan','جارٍ تحديد موقعك...':'Locating you...','تم تفعيل الأذان. أبقِ هذه الصفحة مفتوحة.':'Adhan enabled. Keep this page open.','تم كتم الأذان.':'Adhan muted.','اكتب اسم المدينة أولًا.':'Enter a city first.','حدّد موقعك أولًا.':'Set your location first.','جارٍ تجهيز ملف التقويم...':'Preparing calendar file...','لا يوجد اتصال، يتم عرض آخر مواقيت محفوظة.':'Offline: showing last saved times.','تعذّر جلب المواقيت. تحقق من الإنترنت أو اسم المدينة والدولة (بالإنجليزية).':'Could not load times. Check internet or city/country name.','📅 التقويم والمناسبات':'📅 Calendar & occasions','🕋 اتجاه القبلة':'🕋 Qibla direction','⚙️ الإعدادات':'⚙️ Settings','التاريخ الهجري حسب أم القرى وقد يختلف يومًا حسب رؤية الهلال.':'Hijri dates follow Umm al-Qura and may differ by a day with moon sighting.','اتجاه القبلة:':'Qibla direction:','🧭 تفعيل البوصلة':'🧭 Enable compass','ضع الهاتف أفقيًا وأبعده عن المعادن. تحتاج البوصلة رابطًا https (بعد الاستضافة).':'Hold the phone flat, away from metal. The compass needs an https link (once hosted).','اللغة':'Language','الخط':'Font','المؤذن':'Muezzin','صغير':'Small','متوسط':'Medium','كبير':'Large','🎵 اختيار ملف أذان من هاتفك':'🎵 Pick an adhan file from your phone','مشاركة المواقيت عبر واتساب':'Share times on WhatsApp','الإعدادات':'Settings','تفعيل / كتم صوت الأذان':'Enable / mute adhan','إبقاء الشاشة مضاءة':'Keep screen on','الوضع الداكن / الفاتح':'Dark / light mode','المؤذن 1 / Muezzin 1':'Muezzin 1','المؤذن 2 / Muezzin 2':'Muezzin 2','المؤذن 3 / Muezzin 3':'Muezzin 3','ملفي الخاص / My own file':'My own file','النظام / System':'System','اتجاه القبلة غير متاح بعد: حدّد موقعك أولًا.':'Qibla not available yet: set your location first.'};
+const L=a=>lang==='en'&&EN[a]?EN[a]:a, LOC=()=>lang==='en'?'en-GB':'ar-u-nu-latn', lp=x=>x.split('|')[lang==='en'?1:0], PT=n=>lang==='en'?'Time for '+L(n)+' prayer':'حان الآن وقت صلاة '+n;
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let timings=null, soundOn=store.get('sound',false), fired=store.get('fired',''), srcIdx=0, loadedDay='';
+
+// ===== الوضع الداكن =====
+function setTheme(t){document.documentElement.dataset.theme=t;$('thm').textContent=t==='dark'?'☀️':'🌙';store.set('theme',t)}
+setTheme(store.get('theme',matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+$('thm').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+
+// ===== الصوت =====
+const aud=$('aud');
+function paintSound(){$('snd').textContent=soundOn?'🔊':'🔇'}
+paintSound();
+$('snd').onclick=()=>{soundOn=!soundOn;store.set('sound',soundOn);paintSound();
+ if(soundOn){aud.muted=true;aud.src=ADHAN_SOURCES[0];aud.play().then(()=>{aud.pause();aud.muted=false}).catch(()=>{aud.muted=false});say('تم تفعيل الأذان. أبقِ هذه الصفحة مفتوحة.')}
+ else{stopAdhan();say('تم كتم الأذان.')}};
+function playAdhan(force){
+ if(!soundOn&&!force)return;
+ aud.muted=false;aud.src=ADHAN_SOURCES[srcIdx];
+ aud.play().catch(()=>{});
+}
+aud.onerror=()=>{if(srcIdx<ADHAN_SOURCES.length-1){srcIdx++;playAdhan(true)}else{say('تعذّر تشغيل ملف الأذان. تأكد من الاتصال أو ضع adhan.mp3 بجانب الصفحة.');srcIdx=0}};
+aud.onended=()=>$('alert').classList.remove('show');
+function stopAdhan(){aud.pause();aud.currentTime=0;$('alert').classList.remove('show')}
+$('stop').onclick=stopAdhan;
+$('test').onclick=()=>{srcIdx=0;playAdhan(true);$('atxt').textContent='تجربة الأذان';$('alert').classList.add('show')};
+
+function say(t){$('msg').textContent=L(t)}
+
+// ===== جلب المواقيت =====
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+async function getJSON(u){const c=new AbortController(),t=setTimeout(()=>c.abort(),15000);
+ try{const r=await fetch(u,{signal:c.signal});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json()}finally{clearTimeout(t)}}
+function calcTimes(date,lat,lon,mt){
+ const R=Math.PI/180,S=x=>Math.sin(x*R),C=x=>Math.cos(x*R),fx=(x,a)=>x-a*Math.floor(x/a),tz=-date.getTimezoneOffset()/60;
+ let y=date.getFullYear(),mo=date.getMonth()+1;const dd=date.getDate();if(mo<=2){y--;mo+=12}
+ const A=Math.floor(y/100),B=2-A+Math.floor(A/4),jd=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(mo+1))+dd+B-1524.5-lon/360;
+ const sp=j=>{const D=j-2451545,g=fx(357.529+0.98560028*D,360),q=fx(280.459+0.98564736*D,360),Lm=fx(q+1.915*S(g)+0.02*S(2*g),360),e=23.439-3.6e-7*D;
+  return{d:Math.asin(S(e)*S(Lm))/R,t:q/15-fx(Math.atan2(C(e)*S(Lm),C(Lm))/R/15,24)}};
+ const md=t=>fx(12-sp(jd+t).t,24);
+ const sat=(g,t,ccw)=>{const dc=sp(jd+t).d,z=Math.acos((-S(g)-S(dc)*S(lat))/(C(dc)*C(lat)))/R/15;return md(t)+(ccw?-z:z)};
+ const M={1:[18,18],2:[15,15],3:[18,17],4:[18.5,null],5:[19.5,17.5]}[mt]||[18.5,null];
+ const dA=sp(jd+13/24).d,ag=-Math.atan(1/(1+Math.tan(Math.abs(lat-dA)*R)))/R;
+ const tm={Fajr:sat(M[0],5/24,1),Sunrise:sat(0.833,6/24,1),Dhuhr:md(.5),Asr:sat(ag,13/24,0),Maghrib:sat(0.833,18/24,0)};
+ tm.Isha=M[1]===null?tm.Maghrib+1.5:sat(M[1],18/24,0);
+ const off=tz-lon/15,o={};
+ for(const k in tm){const v=fx(tm[k]+off+1/120,24),h=Math.floor(v);o[k]=pad(h)+':'+pad(Math.floor((v-h)*60))}
+ return o}
+async function fetchTimes(loc){
+ const d=new Date(),ds=pad(d.getDate())+'-'+pad(d.getMonth()+1)+'-'+d.getFullYear(),m=$('method').value;
+ const url=loc.city
+  ?`https://api.aladhan.com/v1/timingsByCity/${ds}?city=${encodeURIComponent(loc.city)}&country=${encodeURIComponent(loc.country||'')}&method=${m}`
+  :`https://api.aladhan.com/v1/timings/${ds}?latitude=${loc.lat}&longitude=${loc.lon}&method=${m}`;
+ let err='';
+ try{
+  const j=await getJSON(url);
+  if(j.code!==200)throw new Error('API '+j.code);
+  timings=j.data.timings;loadedDay=ymd(d);coords={lat:+j.data.meta.latitude,lon:+j.data.meta.longitude};updQ();
+  store.set('cache',{day:loadedDay,timings});
+  const h=j.data.date.hijri;
+  say(((loc.city||loc.place)?(loc.city||loc.place)+' — ':'')+j.data.meta.timezone+' — '+h.day+' '+(lang==='en'?h.month.en:h.month.ar)+' '+h.year+(lang==='en'?' AH':' هـ'));
+  renderList();return;
+ }catch(e){err=e&&e.name==='AbortError'?'timeout':(e.message||String(e))}
+ try{
+  let la=loc.lat,lo=loc.lon;
+  if(la===undefined&&loc.city){
+   const g=await getJSON('https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&name='+encodeURIComponent(loc.city)),r0=(g.results||[])[0];
+   if(r0){la=r0.latitude;lo=r0.longitude}
+  }
+  if(la!==undefined){
+   timings=calcTimes(d,la,lo,+m);loadedDay=ymd(d);coords={lat:la,lon:lo};updQ();renderList();
+   say(lang==='en'?'Times calculated inside the app (approximate) because the online service did not respond.':'تم حساب المواقيت داخل التطبيق (تقريبية) لأن الخدمة على الإنترنت لم تستجب.');return;
+  }
+ }catch(e2){err+=' | '+(e2.message||String(e2))}
+ const c=store.get('cache',null);
+ if(c&&c.day===ymd(d)){timings=c.timings;loadedDay=c.day;say('لا يوجد اتصال، يتم عرض آخر مواقيت محفوظة.')}
+ else say((lang==='en'?'Could not load times. Check internet and the city/country name in English. Details: ':'تعذّر جلب المواقيت. تحقق من الإنترنت واسم المدينة والدولة بالإنجليزية. التفاصيل: ')+err);
+ renderList();
+}
+async function placeName(lat,lon){
+ try{const r=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`);
+  const j=await r.json();detCC=j.countryCode||detCC;ccSync();return j.city||j.locality||j.principalSubdivision||''}catch(e){return ''}
+}
+async function ipLocate(){
+ try{const r=await fetch('https://get.geojs.io/v1/ip/geo.json');const j=await r.json();
+  detCC=j.country_code||detCC;ccSync();const loc={lat:+j.latitude,lon:+j.longitude,place:j.city||j.country||''};
+  store.set('loc',loc);await fetchTimes(loc);
+  say('تم تحديد موقعك تقريبيًا عبر الإنترنت. لدقة أعلى فعّل خدمة الموقع (GPS) في هاتفك ثم اضغط 📍.');
+  return true}catch(e){return false}
+}
+function locate(silent){
+ if(silent!==true)say('جارٍ تحديد موقعك...');
+ const fail=async(why)=>{
+  if(silent===true)return;
+  if(await ipLocate())return;
+  say(why+' أدخل المدينة والدولة ثم اضغط «بحث بالمدينة».');
+ };
+ if(!navigator.geolocation){fail('المتصفح لا يدعم تحديد الموقع.');return}
+ navigator.geolocation.getCurrentPosition(
+  async p=>{const loc={lat:p.coords.latitude,lon:p.coords.longitude};
+   loc.place=await placeName(loc.lat,loc.lon);store.set('loc',loc);fetchTimes(loc)},
+  e=>fail(e&&e.code===1?'تم رفض إذن الموقع. اسمح به من إعدادات الموقع في المتصفح (أيقونة القفل بجانب العنوان).':e&&e.code===2?'خدمة الموقع (GPS) مغلقة في هاتفك، فعّلها من الإعدادات.':'انتهت مهلة تحديد الموقع.'),
+  {timeout:15000,enableHighAccuracy:false,maximumAge:600000});
+}
+$('gps').onclick=()=>locate();
+$('go').onclick=()=>{
+ const city=$('city').value.trim(), country=$('country').value.trim();
+ if(!city){say('اكتب اسم المدينة أولًا.');return}
+ const loc={city,country};store.set('loc',loc);fetchTimes(loc)};
+$('method').value=store.get('method','4');
+$('method').onchange=()=>{store.set('method',$('method').value);const l=store.get('loc',null);if(l)fetchTimes(l)};
+
+// ===== العرض =====
+function at(hhmm,base){const m=String(hhmm).match(/(\d{1,2}):(\d{2})/);return new Date(base.getFullYear(),base.getMonth(),base.getDate(),+m[1],+m[2],0)}
+function renderList(){
+ const LS=$('list');LS.innerHTML='';
+ PRAYERS.forEach(([k,n])=>{
+  const r=document.createElement('div');r.className='row'+(k==='Sunrise'?' sun':'');r.id='r-'+k;
+  r.innerHTML=`<span>${L(n)}</span><span>${timings?String(timings[k]).slice(0,5):'--:--'}</span>`;LS.appendChild(r)});
+}
+renderList();
+
+function tick(){
+ const now=new Date();
+ $('clock').textContent=pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+ $('date').textContent=now.toLocaleDateString(LOC(),{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ if(!timings)return;
+ if(loadedDay!==ymd(now)){const l=store.get('loc',null);loadedDay=ymd(now);if(l)fetchTimes(l);return}
+
+ const list=PRAYERS.map(([k,n])=>({k,n,t:at(timings[k],now)}));
+ const adhan=list.filter(p=>p.k!=='Sunrise');
+ let nx=adhan.find(p=>p.t>now), prev=[...adhan].reverse().find(p=>p.t<=now);
+ let target;
+ if(nx){target=nx.t}else{nx=adhan[0];target=new Date(nx.t.getTime()+864e5);prev=adhan[adhan.length-1]}
+ const diff=Math.max(0,Math.floor((target-now)/1000));
+ $('nname').textContent=L(nx.n);
+ $('cd').textContent=pad(Math.floor(diff/3600))+':'+pad(Math.floor(diff%3600/60))+':'+pad(diff%60);
+ const start=prev?(prev.t>now?new Date(prev.t.getTime()-864e5):prev.t):new Date(target.getTime()-864e5);
+ $('bar').style.width=Math.min(100,Math.max(0,(now-start)/(target-start)*100))+'%';
+
+ list.forEach(p=>{const el=$('r-'+p.k);if(!el)return;
+  el.classList.toggle('on',p.k===nx.k&&!!adhan.find(a=>a.t>now));
+  el.classList.toggle('done',p.t<=now)});
+
+ // وقت الأذان
+ adhan.forEach(p=>{
+  const d=now-p.t, key=ymd(now)+p.k;
+  if(d>=0&&d<8000&&fired!==key){
+   fired=key;store.set('fired',fired);
+   $('atxt').textContent=PT(p.n);$('alert').classList.add('show');
+   if(soundOn){srcIdx=0;playAdhan()}
+   notify(PT(p.n),PT(p.n));
+  }});
+}
+setInterval(tick,1000);tick();
+
+// ===== بدء التشغيل =====
+const saved=store.get('loc',null);
+if(saved){if(saved.city){$('city').value=saved.city;$('country').value=saved.country||''}fetchTimes(saved);if(saved.lat!==undefined)locate(true)}else locate();
+
+// ===== إبقاء الشاشة مضاءة (ليعمل الأذان على الهاتف) =====
+let wl=null;
+async function setWake(on){
+ try{
+  if(on){wl=await navigator.wakeLock.request('screen');wl.onrelease=()=>{wl=null;$('wl').style.opacity=.5}}
+  else if(wl){await wl.release();wl=null}
+  $('wl').style.opacity=on?1:.5;store.set('wake',on);
+  if(on)say('الشاشة ستبقى مضاءة ما دامت الصفحة مفتوحة.');
+ }catch(e){say('متصفحك لا يدعم إبقاء الشاشة مضاءة.')}
+}
+$('wl').onclick=()=>setWake(!wl);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&store.get('wake',false)&&!wl)setWake(true)});
+if(store.get('wake',false))setWake(true);
+if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// ===== الإشعارات =====
+async function notify(t,b){
+ try{if(navigator.vibrate)navigator.vibrate([300,150,300])}catch(e){}
+ try{
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
+  if(reg){await reg.showNotification(t,{body:b,icon:'icon-192.png',vibrate:[300,150,300],tag:'adhan',renotify:true});return}
+  new Notification(t,{body:b});
+ }catch(e){}
+}
+$('notif').onclick=async()=>{
+ if(!('Notification' in window)){say('متصفحك لا يدعم الإشعارات. استخدم زر التقويم 📅.');return}
+ const r=await Notification.requestPermission();
+ if(r==='granted'){notify('نور الأذان','تم تفعيل الإشعارات.');say('تم تفعيل الإشعارات. تعمل والتطبيق مفتوح. للتنبيه وهو مغلق استخدم زر التقويم 📅.')}
+ else say('تم رفض الإشعارات. فعّلها من إعدادات الموقع في المتصفح.');
+};
+
+// ===== تصدير المواقيت إلى تقويم الهاتف (تنبيهات تعمل والتطبيق مغلق) =====
+const fmt=d=>d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';
+$('cal').onclick=async()=>{
+ const l=store.get('loc',null);if(!l){say('حدّد موقعك أولًا.');return}
+ say('جارٍ تجهيز ملف التقويم...');
+ const now=new Date(),m=$('method').value,days=[];
+ try{
+  for(let k=0;k<2;k++){
+   const d=new Date(now.getFullYear(),now.getMonth()+k,1),y=d.getFullYear(),mo=d.getMonth()+1;
+   const u=l.city?`https://api.aladhan.com/v1/calendarByCity/${y}/${mo}?city=${encodeURIComponent(l.city)}&country=${encodeURIComponent(l.country||'')}&method=${m}`
+    :`https://api.aladhan.com/v1/calendar/${y}/${mo}?latitude=${l.lat}&longitude=${l.lon}&method=${m}`;
+   const j=await (await fetch(u)).json();if(j.code!==200)throw 0;days.push(...j.data);
+  }
+ }catch(e){say('تعذّر جلب مواقيت الشهر. تحقق من الإنترنت.');return}
+ const today=new Date(now.getFullYear(),now.getMonth(),now.getDate()),end=new Date(today.getTime()+30*864e5);
+ const stamp=now.toISOString().replace(/[-:]|\.\d{3}/g,'');
+ const out=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//NurAlAdhan//AR//EN','CALSCALE:GREGORIAN'];let n=0;
+ days.forEach(x=>{
+  const [dd,mm,yy]=x.date.gregorian.date.split('-').map(Number),dt=new Date(yy,mm-1,dd);
+  if(dt<today||dt>end)return;
+  PRAYERS.forEach(([k,nm])=>{
+   if(k==='Sunrise')return;
+   const t=String(x.timings[k]).match(/(\d{1,2}):(\d{2})/);if(!t)return;
+   const st=new Date(yy,mm-1,dd,+t[1],+t[2]),en=new Date(st.getTime()+10*60000);
+   out.push('BEGIN:VEVENT','UID:'+k+fmt(st)+'@nur-al-adhan','DTSTAMP:'+stamp,'SUMMARY:صلاة '+nm,'DTSTART:'+fmt(st),'DTEND:'+fmt(en),
+    'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:حان وقت صلاة '+nm,'END:VALARM','END:VEVENT');n++;
+  });
+ });
+ out.push('END:VCALENDAR');
+ const blob=new Blob([out.join('\r\n')],{type:'text/calendar;charset=utf-8'}),a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);a.download='nur-al-adhan.ics';document.body.appendChild(a);a.click();a.remove();
+ say('تم تجهيز '+n+' تنبيهًا. افتح الملف الذي نزل لإضافته إلى تقويم هاتفك.');
+};
+
+// ===== اللغة والإعدادات =====
+function applyLang(){
+ document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+ const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
+ while(n=w.nextNode()){if(n._a===undefined)n._a=n.nodeValue.trim();if(EN[n._a]){n.nodeValue=n.nodeValue.replace(/\S[\s\S]*\S|\S/,lang==='en'?EN[n._a]:n._a)}}
+ document.querySelectorAll('[placeholder],[title]').forEach(e=>['placeholder','title'].forEach(a=>{if(!e.hasAttribute(a))return;if(!e['_'+a])e['_'+a]=e.getAttribute(a);const v=e['_'+a];if(EN[v])e.setAttribute(a,lang==='en'?EN[v]:v)}));
+ renderList();tick();renderCal();updQ();
+}
+$('slang').value=lang;$('slang').onchange=()=>{lang=$('slang').value;store.set('lang',lang);applyLang()};
+const FONTS={'system-ui':'system-ui'};
+function applyFont(){const f=store.get('font','Cairo');document.documentElement.style.setProperty('--f',f.indexOf(' ')>0?'"'+f+'"':f);$('sfont').value=f;
+ const z=store.get('size','1');document.querySelector('.wrap').style.zoom=z;$('ssize').value=z}
+$('sfont').onchange=()=>{store.set('font',$('sfont').value);applyFont()};
+$('ssize').onchange=()=>{store.set('size',$('ssize').value);applyFont()};
+$('set').onclick=()=>{$('dset').open=true;$('dset').scrollIntoView({behavior:'smooth'})};
+// المؤذن
+const MUA=[['https://cdn.aladhan.com/audio/adhans/a1.mp3','https://www.islamcan.com/audio/adhan/azan1.mp3'],['https://cdn.aladhan.com/audio/adhans/a2.mp3','https://www.islamcan.com/audio/adhan/azan2.mp3'],['https://cdn.aladhan.com/audio/adhans/a3.mp3','https://www.islamcan.com/audio/adhan/azan3.mp3']];
+const idb=()=>new Promise((ok,no)=>{const r=indexedDB.open('adhan',1);r.onupgradeneeded=()=>r.result.createObjectStore('f');r.onsuccess=()=>ok(r.result);r.onerror=no});
+async function idbSet(k,v){const d=await idb();return new Promise(ok=>{const t=d.transaction('f','readwrite');t.objectStore('f').put(v,k);t.oncomplete=ok;t.onerror=ok})}
+async function idbGet(k){try{const d=await idb();return await new Promise(ok=>{const q=d.transaction('f').objectStore('f').get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>ok(null)})}catch(e){return null}}
+async function setMua(i){
+ srcIdx=0;$('smua').value=i;store.set('mua',i);$('snote').textContent='';
+ if(i==3){const b=await idbGet('custom');if(b){ADHAN_SOURCES=[URL.createObjectURL(b)];$('snote').textContent=lang==='en'?'Using your file.':'يتم استخدام ملفك.';return}
+  $('snote').textContent=lang==='en'?'Pick an audio file first.':'اختر ملف أذان أولًا.';}
+ ADHAN_SOURCES=(MUA[i]||MUA[0]).concat(['adhan.mp3']);
+}
+$('smua').onchange=()=>setMua(+$('smua').value);
+$('sfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;await idbSet('custom',f);setMua(3)};
+
+// ===== واتساب =====
+$('wa').onclick=()=>{
+ if(!timings){say('حدّد موقعك أولًا.');return}
+ const l=store.get('loc',{}),pl=l.city||l.place||'',en=lang==='en';
+ let m=(en?'🕌 Prayer times':'🕌 مواقيت الصلاة')+(pl?' — '+pl:'')+'\n'+new Date().toLocaleDateString(LOC(),{weekday:'long',day:'numeric',month:'long',year:'numeric'})+'\n\n';
+ PRAYERS.forEach(([k,n])=>m+=L(n)+': '+String(timings[k]).slice(0,5)+'\n');
+ m+='\n'+(en?'Nour Al-Adhan':'نور الأذان')+(location.protocol.indexOf('http')===0?'\n'+location.href.split('#')[0]:'');
+ window.open('https://wa.me/?text='+encodeURIComponent(m),'_blank');
+};
+
+// ===== القبلة =====
+function qb(la,lo){const r=Math.PI/180,dl=(39.8262-lo)*r;return(Math.atan2(Math.sin(dl),Math.cos(la*r)*Math.tan(21.4225*r)-Math.sin(la*r)*Math.cos(dl))/r+360)%360}
+function updQ(){
+ if(!coords){$('qdeg').textContent='--';return}
+ const b=qb(coords.lat,coords.lon);$('qdeg').textContent=Math.round(b)+'° '+(lang==='en'?'from north':'من الشمال');
+ $('qarrow').style.transform='rotate('+b+'deg)';$('dial').style.transform='rotate('+(heading==null?0:-heading)+'deg)';
+}
+$('qbtn').onclick=async()=>{
+ try{if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission&&await DeviceOrientationEvent.requestPermission()!=='granted'){$('qnote').textContent=lang==='en'?'Compass permission denied.':'تم رفض إذن البوصلة.';return}}catch(e){}
+ const h=e=>{const v=e.webkitCompassHeading!==undefined?e.webkitCompassHeading:((e.absolute||e.type==='deviceorientationabsolute')&&e.alpha!=null?360-e.alpha:null);if(v!=null){heading=v;updQ()}};
+ addEventListener('deviceorientationabsolute',h,true);addEventListener('deviceorientation',h,true);
+ $('qnote').textContent=lang==='en'?'Turn until the 🕋 points up.':'أدر هاتفك حتى تصبح 🕋 في الأعلى.';
+};
+
+// ===== التقويم والمناسبات =====
+const ISL={'1-1':'رأس السنة الهجرية|Islamic New Year','1-10':'يوم عاشوراء|Ashura','3-12':'المولد النبوي|Mawlid','7-27':'الإسراء والمعراج|Isra and Miraj','8-15':'ليلة النصف من شعبان|Mid-Sha‘ban','9-1':'أول رمضان|Start of Ramadan','9-27':'ليلة القدر (27)|Laylat al-Qadr (27th)','10-1':'عيد الفطر|Eid al-Fitr','10-2':'عيد الفطر (2)|Eid al-Fitr (day 2)','10-3':'عيد الفطر (3)|Eid al-Fitr (day 3)','12-9':'يوم عرفة|Day of Arafah','12-10':'عيد الأضحى|Eid al-Adha','12-11':'عيد الأضحى (2)|Eid al-Adha (day 2)','12-12':'عيد الأضحى (3)|Eid al-Adha (day 3)'};
+const NAT={EG:{'1-7':'عيد الميلاد المجيد|Coptic Christmas','1-25':'عيد الثورة وعيد الشرطة|Revolution & Police Day','4-25':'عيد تحرير سيناء|Sinai Liberation Day','5-1':'عيد العمال|Labour Day','6-30':'ذكرى ثورة 30 يونيو|June 30 Revolution','7-23':'ذكرى ثورة 23 يوليو|July 23 Revolution','10-6':'عيد القوات المسلحة|Armed Forces Day'},SA:{'2-22':'يوم التأسيس|Founding Day','9-23':'اليوم الوطني|National Day'},AE:{'1-1':'رأس السنة الميلادية|New Year','12-2':'اليوم الوطني|National Day','12-3':'اليوم الوطني (2)|National Day (2)'},QA:{'12-18':'اليوم الوطني|National Day'},KW:{'2-25':'اليوم الوطني|National Day','2-26':'يوم التحرير|Liberation Day'},BH:{'12-16':'اليوم الوطني|National Day','12-17':'اليوم الوطني (2)|National Day (2)'},OM:{'11-18':'اليوم الوطني|National Day','11-20':'اليوم الوطني (2)|National Day (2)'},JO:{'5-25':'عيد الاستقلال|Independence Day','5-1':'عيد العمال|Labour Day'},LB:{'11-22':'عيد الاستقلال|Independence Day','5-1':'عيد العمال|Labour Day'}};
+function egx(y){const a=y%4,b=y%7,c=y%19,d=(19*c+15)%30,e=(2*a+4*b-d+34)%7,t=d+e+114,m=Math.floor(t/31),dd=t%31+1,o={};
+ const ea=new Date(y,m-1,dd+13),sh=new Date(y,m-1,dd+14);
+ o[(ea.getMonth()+1)+'-'+ea.getDate()]='عيد القيامة المجيد|Coptic Easter';o[(sh.getMonth()+1)+'-'+sh.getDate()]='شم النسيم|Sham El-Nessim';
+ o[(y+1)%4===0?'9-12':'9-11']='رأس السنة القبطية|Coptic New Year';return o}
+const HF=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn',{day:'numeric',month:'numeric',year:'numeric'});
+const hij=d=>{const p=HF.formatToParts(d),g=t=>+p.find(x=>x.type===t).value;return{d:g('day'),m:g('month'),y:g('year')}};
+let cy=new Date().getFullYear(),cm=new Date().getMonth();const nager={};
+function ccSync(){if(detCC&&!store.get('ccm',false)&&[...$('ctry').options].some(o=>o.value===detCC)){$('ctry').value=detCC;renderCal()}}
+$('ctry').value=store.get('cc','SA');
+$('ctry').onchange=()=>{store.set('cc',$('ctry').value);store.set('ccm',true);renderCal()};
+$('cp').onclick=()=>{cm--;if(cm<0){cm=11;cy--}renderCal()};$('cn').onclick=()=>{cm++;if(cm>11){cm=0;cy++}renderCal()};
+$('dcal').ontoggle=renderCal;
+async function nag(y,cc){const k=y+cc;if(nager[k])return nager[k];nager[k]={};
+ if(cc==='XX'||NAT[cc])return nager[k];
+ try{const r=await fetch(`https://date.nager.at/api/v3/PublicHolidays/${y}/${cc}`);if(r.ok){(await r.json()).forEach(h=>{(nager[k][h.date]=nager[k][h.date]||[]).push(lang==='en'?h.name:h.localName)})}}catch(e){}
+ return nager[k]}
+async function renderCal(){
+ if(!$('dcal').open)return;
+ const cc=$('ctry').value,nd=new Date(cy,cm+1,0).getDate(),first=new Date(cy,cm,1),lc=LOC(),ng=await nag(cy,cc),ar=lang==='ar',evs=[];
+ const h1=hij(new Date(cy,cm,15,12));
+ $('ctitle').textContent=first.toLocaleDateString(lc,{month:'long',year:'numeric'})+' — '+new Date(cy,cm,15,12).toLocaleDateString((ar?'ar':'en')+'-u-ca-islamic-umalqura-nu-latn',{month:'long',year:'numeric'});
+ let g='';const off=ar?(first.getDay()+1)%7:first.getDay();
+ for(let i=0;i<7;i++)g+='<b>'+new Date(2023,0,(ar?7:1)+i).toLocaleDateString(lc,{weekday:'short'})+'</b>';
+ for(let i=0;i<off;i++)g+='<div></div>';
+ const now=new Date();
+ for(let d=1;d<=nd;d++){
+  const dt=new Date(cy,cm,d,12),h=hij(dt),names=[];
+  if(ISL[h.m+'-'+h.d])names.push(lp(ISL[h.m+'-'+h.d]));
+  const nt=NAT[cc]&&NAT[cc][(cm+1)+'-'+d];if(nt)names.push(lp(nt));if(cc==='EG'){const x=egx(cy)[(cm+1)+'-'+d];if(x)names.push(lp(x))}
+  (ng[cy+'-'+pad(cm+1)+'-'+pad(d)]||[]).forEach(x=>names.push(x));
+  names.forEach(x=>evs.push([d,x]));
+  const t=d===now.getDate()&&cm===now.getMonth()&&cy===now.getFullYear();
+  g+=`<div class="d${names.length?' h':''}${t?' t':''}">${d}<small>${h.d}</small></div>`;
+ }
+ $('cgrid').innerHTML=g;
+ $('cev').innerHTML=evs.length?evs.map(e=>`<div class="ev"><span>${e[1]}</span><span>${e[0]}</span></div>`).join(''):'<div class="q">'+(ar?'لا توجد مناسبات هذا الشهر.':'No occasions this month.')+'</div>';
+}
+
+addEventListener('error',e=>{try{$('msg').textContent='Error: '+e.message}catch(_){}});
+addEventListener('unhandledrejection',e=>{try{$('msg').textContent='Error: '+(e.reason&&e.reason.message||e.reason)}catch(_){}});
+// بدء
+applyFont();setMua(store.get('mua',0));applyLang();
+</script>
+</body>
+</html>
